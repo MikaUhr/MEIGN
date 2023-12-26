@@ -8,10 +8,10 @@ For more information on the algorithm, please see [Uehara M, Inoue T, Hase S, Sa
 ## Execute the module extraction method
 Execute module extraction with:
 ```
-MEIGN.py [path of output directory] [Host-microbiome gene correlation data] [Host-host gene correlation data] [Microbiome-microbiome gene correlation data]
+MEIGN.py [Path of output directory] [Host-microbiome gene correlation data] [Host-host gene correlation data] [Microbiome-microbiome gene correlation data]
 ```
 
-* path of output directory - set the output directory.
+* Path of output directory - set the output directory.
 * Host-microbiome gene correlation data - Enter a table representing the correlation between host and microbiome genes (first column: host gene name, second column: microbiome gene name, third column: correlation coefficient). The first row will be treated as a header.
 * Host-host gene correlation data - Enter a table representing the correlation between host genes (first column: host gene name, second column: host gene name, third column: correlation coefficient). The first row will be treated as a header.
 * Microbiome-microbiome gene correlation data - Enter a table representing the correlation between microbiome genes (first column: microbiome gene name, second column: microbiome gene name, third column: correlation coefficient). The first row will be treated as a header.
