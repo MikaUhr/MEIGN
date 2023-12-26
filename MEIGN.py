@@ -3,15 +3,10 @@
 
 import numpy as np
 import pandas as pd 
-import matplotlib.pyplot as plt 
 from sklearn import cluster, preprocessing 
 from sklearn import datasets 
 import networkx as nx
 import networkx.algorithms.community as nx_comm
-from networkx.algorithms import bipartite
-import collections
-import scipy
-import scipy.stats as stats
 import copy
 import statsmodels.stats.multitest as multi
 import argparse
@@ -31,9 +26,9 @@ path_dir_out = sys.argv[1] # Path of output directory
 path_spearman_hm = sys.argv[2] # Path of data frame for host-microbiome gene correlation coefficients
 path_spearman_hh = sys.argv[3] # Path of data frame for host-host gene correlation coefficients
 path_spearman_mm = sys.argv[4] # Path of data frame for microbiome-microbiome gene correlation coefficients
-df_hm = pd.read_csv(path_spearman_hm, sep = '\t', header=0, index_col=None, names=['host_gene', 'microbiome_gene'])
-df_hh = pd.read_csv(path_spearman_hh, sep = '\t', header=0, index_col=None, names=['gene1', 'gene2'])
-df_mm = pd.read_csv(path_spearman_mm, sep = '\t', header=0, index_col=None, names=['gene1', 'gene2'])
+df_hm = pd.read_csv(path_spearman_hm, sep = '\t', header=0, index_col=None, names=['host_gene', 'microbiome_gene', 'correlation_r'])
+df_hh = pd.read_csv(path_spearman_hh, sep = '\t', header=0, index_col=None, names=['gene1', 'gene2', 'correlation_r'])
+df_mm = pd.read_csv(path_spearman_mm, sep = '\t', header=0, index_col=None, names=['gene1', 'gene2', 'correlation_r'])
 
 # extract gene list including all three dataset
 list_host_gene = set(list(df_hh['gene1']) + list(df_hh['gene2']))
@@ -52,9 +47,9 @@ df_hm = df_hm[df_hm['host_gene'].isin(list_host_gene)]
 df_hm = df_hm[df_hm['microbiome_gene'].isin(list_mcrb_gene)]
 
 def preprocessing(df_hm, df_hh, df_mm, thres_cor):
-    df_hm = df_hm[abs(df_hm['spearman_r'])>thres_cor]
-    df_hh = df_hh[df_hh['spearman_r']>thres_cor]
-    df_mm = df_mm[df_mm['spearman_r']>thres_cor]
+    df_hm = df_hm[abs(df_hm['correlation_r'])>thres_cor]
+    df_hh = df_hh[df_hh['correlation_r']>thres_cor]
+    df_mm = df_mm[df_mm['correlation_r']>thres_cor]
 
     # Host-Host correlation: extract genes including the correlated host-microbiome gene pair 
     df_hh = df_hh[(df_hh['gene1'].isin(list(set(df_hm.loc[:,'host_gene'])))) & (df_hh['gene2'].isin(list(set(df_hm.loc[:,'host_gene']))))]
@@ -134,7 +129,7 @@ def compute_cliquness(commun1, commun2, G):
     
     return cliqueness_host, cliqueness_microb, cliqueness_host_microbiome
 
-def module_extraction(G, thres_clique_num, thres_clique_rate):
+def module_extraction(G, thres_clique_num, thres_cliqueness):
     dict_clique_num = nx.node_clique_number(G)
     
     list_modules = []
@@ -165,7 +160,7 @@ def module_extraction(G, thres_clique_num, thres_clique_rate):
             if clique_rate_min > max_clique_rate:
                 max_clique_rate = clique_rate_min
                 max_clique_num = i
-        if max_clique_rate > thres_clique_rate:
+        if max_clique_rate > thres_cliqueness:
             list_modules[max_clique_num] = sorted(list(set(list_modules[max_clique_num]).union(set(list_nodes))))
         else:
             list_modules.append(sorted(list_nodes))
@@ -176,10 +171,9 @@ df_hm_process, df_hh_process, df_mm_process = preprocessing(df_hm, df_hh, df_mm,
 
 # Make Graph
 G = make_graph(df_hm_process, df_hh_process, df_mm_process)
-print('______Made Graph')
 
 # Find modules
-list_modules = community_extraction_w_merge_host_microb_and(G, thres_clique_num, thres_cliqueness)
+list_modules = module_extraction(G, thres_clique_num, thres_cliqueness)
 
 # Output clique member list
 path_out = path_dir_out + '/module_list.tsv'    
@@ -189,6 +183,3 @@ with open(path_out, 'w', encoding='utf-8', newline='\n') as f:
         for data in data_slice:
             f.write("%s\t" % data)
         f.write('\n')
-
-
-
