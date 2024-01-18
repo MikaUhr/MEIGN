@@ -15,3 +15,11 @@ MEIGN.py [Path of output directory] [Host-microbiome gene correlation data] [Hos
 * Host-microbiome gene correlation data - Enter a table representing the correlation between host and microbiome genes (first column: host gene name, second column: microbiome gene name, third column: correlation coefficient). The first row will be treated as a header.
 * Host-host gene correlation data - Enter a table representing the correlation between host genes (first column: host gene name, second column: host gene name, third column: correlation coefficient). The first row will be treated as a header.
 * Microbiome-microbiome gene correlation data - Enter a table representing the correlation between microbiome genes (first column: microbiome gene name, second column: microbiome gene name, third column: correlation coefficient). The first row will be treated as a header.
+
+### Option
+```
+MEIGN.py [Path of output directory] [Host-microbiome gene correlation data] [Host-host gene correlation data] [Microbiome-microbiome gene correlation data] --edge [float value] --number [int value] --cliqueness [float value]
+```
+* --edge, -e [float value] : Correlation coefficient threshold. An edge is drawn if this threshold is exceeded in the gene co-expression network. 0.0 - 1.0 is accepted.
+* --number, -n [int value]: Minimum number of nodes in clique.
+* --cliqueness, -c [float value]: Threshold of cliqueness when merging modules. 0.0 - 1.0 is accepted.
